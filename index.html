@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindCare Hub - Your Mental Wellness Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+      } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDVmQmuzYFAr-qQhjkhbFfpK10B72dMkh0",
+        authDomain: "manomitra-25092.firebaseapp.com",
+        projectId: "manomitra-25092",
+        storageBucket: "manomitra-25092.firebasestorage.app",
+        messagingSenderId: "110177277389",
+        appId: "1:110177277389:web:0af43d9960eb24b7dfa084",
+        measurementId: "G-HPRSJ4DTMQ",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window.firebase = {
+        app,
+        auth,
+        db,
+        doc,
+        getDoc,
+        setDoc,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      };
+    </script>
+    <style>
+      /* =======================================================================
+        === CSS STYLES (style.css)                                          ===
+        =======================================================================
+        */
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f7f7f9;
+      }
+
+      /* Custom scrollbar for a softer look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #e9e9f2;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #b8b8d1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #9f9fb8;
+      }
+
+      /* Soothing gradient for hero section */
+      .hero-gradient {
+        background: linear-gradient(135deg, #f3e8ff 0%, #d8b4fe 100%);
+      }
+
+      /* Glassmorphism effect for chatbot and forms */
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      /* Animation for feature cards on hover */
+      .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 25px -5px rgba(156, 163, 175, 0.1),
+          0 8px 10px -6px rgba(156, 163, 175, 0.1);
+      }
+
+      /* Chatbot styling */
+      .chat-bubble {
+        max-width: 80%;
+        padding: 12px 18px;
+        border-radius: 22px;
+        word-wrap: break-word;
+        line-height: 1.5;
+      }
+      .user-bubble {
+        background-color: #7c3aed;
+        color: white;
+        border-bottom-right-radius: 5px;
+        align-self: flex-end;
+      }
+      .ai-bubble {
+        background-color: #f3f4f6;
+        color: #1f2937;
+        border-bottom-left-radius: 5px;
+        align-self: flex-start;
+      }
+
+      /* Custom button styles for better feel */
+      .btn-primary {
+        background-color: #7c3aed;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+      .btn-primary:hover {
+        background-color: #6d28d9;
+        transform: scale(1.05);
+      }
+
+      .nav-link.active {
+        color: #6d28d9;
+        font-weight: 600;
+        border-bottom: 2px solid #6d28d9;
+      }
+
+      /* Test page styles */
+      .question-card {
+        background: white;
+        border-left: 5px solid #a78bfa;
+        transition: box-shadow 0.3s ease;
+      }
+      .question-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      }
+      .question-option label {
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        border: 1px solid #ddd;
+      }
+      .question-option input:checked + label {
+        background-color: #e9d5ff;
+        border-color: #7c3aed;
+        color: #581c87;
+      }
+
+      /* Result bar styles */
+      .result-bar-container {
+        background-color: #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .result-bar {
+        height: 24px;
+        border-radius: 8px;
+        transition: width 1s ease-out;
+        text-align: right;
+        padding-right: 8px;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 24px;
+      }
+    </style>
+  </head>
+  <body class="text-gray-800">
+    <!-- Header Section -->
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+      <nav
+        class="container mx-auto px-6 py-4 flex justify-between items-center"
+      >
+        <a
+          href="#"
+          class="text-2xl font-bold text-purple-700 nav-link"
+          data-target="page-home"
+        >
+          <i class="fas fa-brain mr-2"></i>MindCare Hub
+        </a>
+        <div class="hidden md:flex space-x-8 items-center">
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-home"
+            >Home</a
+          >
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-resources"
+            >Resources</a
+          >
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-support"
+            >Peer Support</a
+          >
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-booking"
+            >Book Session</a
+          >
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-test"
+            >Wellness Check-in</a
+          >
+          <a
+            href="#"
+            class="nav-link text-gray-600 hover:text-purple-700 transition pb-1"
+            data-target="page-habits"
+            >Healthy Habits</a
+          >
+        </div>
+        <div
+          id="auth-links-desktop"
+          class=" md:flex items-center space-x-2"
+        >
+          <a
+            href="#"
+            class="text-gray-600 hover:text-purple-700 transition nav-link"
+            data-target="page-login"
+            >Login</a
+          >
+          <a
+            href="#"
+            class="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition text-sm nav-link"
+            data-target="page-signup"
+            >Create Account</a
+          >
+        </div>
+        <div
+          id="user-links-desktop"
+          class="hidden md:flex items-center space-x-4"
+        >
+          <span id="user-email-desktop" class="text-sm text-gray-600"></span>
+          <a
+            href="#"
+            id="logout-btn-desktop"
+            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-300 transition text-sm"
+            >Logout</a
+          >
+        </div>
+        <button id="mobile-menu-button" class="md:hidden">
+          <i class="fas fa-bars text-2xl text-gray-600"></i>
+        </button>
+      </nav>
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-home"
+          >Home</a
+        >
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-resources"
+          >Resources</a
+        >
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-support"
+          >Peer Support</a
+        >
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-booking"
+          >Book Session</a
+        >
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-test"
+          >Wellness Check-in</a
+        >
+        <a
+          href="#"
+          class="block py-2 nav-link text-gray-600"
+          data-target="page-habits"
+          >Healthy Habits</a
+        >
+       <div id="auth-links-mobile" class="border-t mt-4 pt-4">
+          <a
+            href="#"
+            class="block py-2 nav-link text-gray-600"
+            data-target="page-login"
+            >Login</a
+          >
+          <a
+            href="#"
+            class="block text-center mt-2 bg-purple-600 text-white px-4 py-2 rounded-full nav-link"
+            data-target="page-signup"
+            >Create Account</a
+          >
+        </div>
+        <div id="user-links-mobile" class="hidden border-t mt-4 pt-4">
+          <span
+            id="user-email-mobile"
+            class="block py-2 text-sm text-gray-600"
+          ></span>
+          <a
+            href="#"
+            id="logout-btn-mobile"
+            class="block text-center mt-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-full"
+            >Logout</a
+          >
+      </div>
+    </header>
+
+    <main>
+      <!-- Home Page -->
+      <div id="page-home" class="page">
+        <section class="hero-gradient py-20 md:py-32">
+          <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
+              A Calmer Mind is Within Reach.
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8">
+              Your confidential university partner for mental wellness. Support,
+              resources, and community are here for you.
+            </p>
+            <a
+              href="#"
+              class="btn-primary text-white font-semibold px-8 py-3 rounded-full shadow-lg nav-link"
+              data-target="page-chatbot"
+            >
+              Talk to our AI Assistant
+            </a>
+          </div>
+        </section>
+        <section id="features" class="py-20 bg-white">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-2">How We Can Help</h2>
+            <p class="text-center text-gray-500 mb-12">
+              Tools and support tailored for your well-being.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div
+                class="feature-card bg-purple-50 p-8 rounded-2xl text-center"
+              >
+                <i class="fas fa-robot text-4xl text-purple-500 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">AI First-Aid Support</h3>
+                <p class="text-gray-600">
+                  Get immediate, 24/7 guidance and coping strategies from our
+                  friendly AI chat assistant.
+                </p>
+              </div>
+              <div
+                class="feature-card bg-indigo-50 p-8 rounded-2xl text-center"
+              >
+                <i
+                  class="fas fa-calendar-check text-4xl text-indigo-500 mb-4"
+                ></i>
+                <h3 class="text-xl font-bold mb-2">Confidential Booking</h3>
+                <p class="text-gray-600">
+                  Easily book a private session with a campus counsellor at your
+                  convenience.
+                </p>
+              </div>
+              <div class="feature-card bg-green-50 p-8 rounded-2xl text-center">
+                <i class="fas fa-book-open text-4xl text-green-500 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Resource Hub</h3>
+                <p class="text-gray-600">
+                  Access curated articles, videos, and relaxation audio in
+                  multiple languages.
+                </p>
+              </div>
+              <div
+                class="feature-card bg-yellow-50 p-8 rounded-2xl text-center"
+              >
+                <i class="fas fa-users text-4xl text-yellow-500 mb-4"></i>
+                <h3 class="text-xl font-bold mb-2">Peer Support Forum</h3>
+                <p class="text-gray-600">
+                  Connect with fellow students in a safe, moderated community
+                  forum.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- AI Chatbot Page -->
+      <div id="page-chatbot" class="page hidden">
+        <section
+          class="py-20"
+          style="background: linear-gradient(to right, #a855f7, #7c3aed)"
+        >
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-white mb-12">
+              AI-Guided First-Aid Support
+            </h2>
+            <div
+              class="max-w-2xl mx-auto glass-effect rounded-2xl shadow-2xl p-4 md:p-6"
+            >
+              <div
+                id="chat-window"
+                class="h-96 overflow-y-auto mb-4 p-4 flex flex-col space-y-4"
+              ></div>
+              <div class="flex">
+                <input
+                  type="text"
+                  id="chat-input"
+                  class="w-full px-4 py-3 rounded-l-full focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  placeholder="Type your message here..."
+                />
+                <button
+                  id="chat-send-btn"
+                  class="bg-purple-600 text-white px-6 py-3 rounded-r-full hover:bg-purple-700 transition"
+                >
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Booking Page -->
+      <div id="page-booking" class="page hidden">
+        <section class="py-20 bg-white">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">
+              Book a Confidential Session
+            </h2>
+            <div class="max-w-lg mx-auto bg-gray-50 p-8 rounded-2xl shadow-lg">
+              <form id="booking-form">
+                <div class="mb-4">
+                  <label
+                    for="counsellor"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Choose a Counsellor</label
+                  >
+                  <select
+                    id="counsellor"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  >
+                    <option>Dr. Anjali Sharma (General Anxiety)</option>
+                    <option>Mr. Rohan Verma (Academic Stress)</option>
+                    <option>Ms. Priya Singh (Depression & Burnout)</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label
+                    for="date"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Select a Date</label
+                  >
+                  <input
+                    type="date"
+                    id="date"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="time"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Select a Time Slot</label
+                  >
+                  <select
+                    id="time"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  >
+                    <option>09:00 AM - 10:00 AM</option>
+                    <option>11:00 AM - 12:00 PM</option>
+                    <option>02:00 PM - 03:00 PM</option>
+                    <option>04:00 PM - 05:00 PM</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg"
+                >
+                  Request Appointment
+                </button>
+                <p
+                  id="booking-success"
+                  class="text-green-600 mt-4 text-center font-semibold hidden"
+                >
+                  Your appointment request has been sent!
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Resources Page -->
+      <div id="page-resources" class="page hidden">
+        <section class="py-20 bg-gray-50">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">
+              Psychoeducational Resource Hub
+            </h2>
+
+            <!-- Instant Relief -->
+            <div class="mb-16">
+              <h3 class="text-2xl font-bold mb-2">Instant Relief</h3>
+              <p class="text-gray-500 mb-6">
+                Feeling overwhelmed right now? Try these short videos and audio
+                tracks to find calm quickly.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/z6z_H_K9lS8"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-purple-500 font-semibold"
+                      >Audio • English</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      5-Minute Meditation
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      A quick, calming meditation to reset your mind.
+                    </p>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/sJ04-cT18j0"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-indigo-500 font-semibold"
+                      >Video • English</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      3-Min Breathing Exercise
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      A 3-minute technique to calm anxiety from a therapist.
+                    </p>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/l7avP_q429Y"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-blue-500 font-semibold"
+                      >Audio • Hindi</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      Relaxing Flute Music
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Soothing music to help reduce stress and find focus.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meditation & Mindfulness -->
+            <div class="mb-16">
+              <h3 class="text-2xl font-bold mb-2">Meditation & Mindfulness</h3>
+              <p class="text-gray-500 mb-6">
+                Build a practice of mindfulness with these guided sessions.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/inpok4MKVLM"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-purple-500 font-semibold"
+                      >Video • English</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      10-Min Meditation for Beginners
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      A perfect start for your mindfulness journey by Goodful.
+                    </p>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/ZToicYcHIOU"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-blue-500 font-semibold"
+                      >Video • Hindi</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      Morning Meditation
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      Start your day with positivity with this guided session in
+                      Hindi.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Exercise & Movement -->
+            <div>
+              <h3 class="text-2xl font-bold mb-2">Exercise & Movement</h3>
+              <p class="text-gray-500 mb-6">
+                Boost your mood and energy with these simple exercise videos.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/4C-gxOE0j7s"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-green-500 font-semibold"
+                      >Video • English</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      10-Min Morning Yoga
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      A gentle full-body stretch to wake up your body and mind.
+                    </p>
+                  </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div class="aspect-w-16 aspect-h-9">
+                    <iframe
+                      src="https://www.youtube.com/embed/F7_zTE_2s-I"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-full h-full"
+                    ></iframe>
+                  </div>
+                  <div class="p-6">
+                    <span class="text-sm text-green-500 font-semibold"
+                      >Video • English</span
+                    >
+                    <h3 class="text-lg font-bold mt-1 mb-2">
+                      5-Min Desk Stretches
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                      A quick stretching routine for study breaks.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Peer Support Page -->
+      <div id="page-support" class="page hidden">
+        <section class="py-20 bg-white">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-4">
+              Peer Support Platform
+            </h2>
+            <p class="text-center text-gray-500 mb-12">
+              Connect anonymously with a community that understands. Share and
+              support.
+            </p>
+            <div class="max-w-3xl mx-auto">
+              <div class="bg-gray-50 p-6 rounded-xl mb-8 shadow">
+                <h3 class="font-bold mb-4 text-lg">Share Your Thoughts</h3>
+                <textarea
+                  id="post-content"
+                  rows="3"
+                  class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  placeholder="What's on your mind? (Your post is anonymous)"
+                ></textarea
+                ><button
+                  id="submit-post-btn"
+                  class="mt-4 btn-primary text-white font-semibold px-6 py-2 rounded-lg"
+                >
+                  Post Anonymously
+                </button>
+              </div>
+              <div id="forum-posts" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                  <p class="text-gray-700">
+                    Feeling really overwhelmed with final exams. It feels like I
+                    can't catch a break. Anyone else feel this way?
+                  </p>
+                  <div class="flex items-center justify-between mt-4">
+                    <span class="text-xs text-gray-400">Posted 2 hours ago</span
+                    ><button
+                      class="text-purple-500 hover:text-purple-700 text-sm font-semibold"
+                    >
+                      <i class="fas fa-heart mr-1"></i> 12 Supports
+                    </button>
+                  </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                  <p class="text-gray-700">
+                    I've been feeling really lonely since moving to the new city
+                    for college. It's hard to make friends. Any advice?
+                  </p>
+                  <div class="flex items-center justify-between mt-4">
+                    <span class="text-xs text-gray-400">Posted 1 day ago</span
+                    ><button
+                      class="text-purple-500 hover:text-purple-700 text-sm font-semibold"
+                    >
+                      <i class="fas fa-heart mr-1"></i> 28 Supports
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Mental Health Test Page -->
+      <div id="page-test" class="page hidden">
+        <section class="py-20 bg-gray-50">
+          <div class="container mx-auto px-6">
+            <div id="test-intro">
+              <h2 class="text-3xl font-bold text-center mb-4">
+                Wellness Check-in
+              </h2>
+              <p class="text-center text-gray-500 max-w-2xl mx-auto mb-8">
+                This is a confidential and private check-in to help you
+                understand your current emotional state. Answer the questions
+                honestly based on how you've felt over the last two weeks. This
+                is not a diagnostic tool.
+              </p>
+              <div class="text-center">
+                <button
+                  id="start-test-btn"
+                  class="btn-primary text-white font-semibold px-8 py-3 rounded-full shadow-lg"
+                >
+                  Start Check-in
+                </button>
+              </div>
+            </div>
+
+            <form
+              id="mental-health-test"
+              class="hidden max-w-3xl mx-auto space-y-6"
+            ></form>
+
+            <div id="test-results" class="hidden max-w-3xl mx-auto">
+              <h2 class="text-3xl font-bold text-center mb-4">
+                Your Check-in Results
+              </h2>
+              <p class="text-center text-gray-500 max-w-2xl mx-auto mb-8">
+                This summary visualizes your responses. It's a tool for
+                reflection, not a diagnosis. Use the "Next Steps" section below
+                for personalized suggestions.
+              </p>
+
+              <div
+                id="results-bars"
+                class="bg-white p-6 sm:p-8 rounded-xl shadow-lg space-y-6"
+              >
+                <!-- Bars will be injected here -->
+              </div>
+
+              <div
+                id="results-recommendations"
+                class="mt-10 bg-white p-6 sm:p-8 rounded-xl shadow-lg"
+              >
+                <!-- Recommendations will be injected here -->
+              </div>
+
+              <div class="text-center">
+                <button
+                  id="retake-test-btn"
+                  class="mt-8 bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition"
+                >
+                  Retake Check-in
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Healthy Habits Page -->
+      <div id="page-habits" class="page hidden">
+        <section class="py-20 bg-white">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-4">
+              Building Healthy Habits
+            </h2>
+            <p class="text-center text-gray-500 max-w-3xl mx-auto mb-12">
+              Small, consistent changes can make a big difference in your mental
+              well-being. Here are some simple do's and don'ts to keep in mind.
+            </p>
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+            >
+              <!-- DO's -->
+              <div class="bg-green-50 p-8 rounded-2xl">
+                <h3
+                  class="text-2xl font-bold text-green-800 mb-6 flex items-center"
+                >
+                  <i class="fas fa-check-circle mr-3"></i>Do's
+                </h3>
+                <ul class="space-y-4 text-green-900">
+                  <li class="flex items-start">
+                    <i class="fas fa-check mt-1 mr-3"></i
+                    ><span
+                      ><strong>Move Your Body Daily:</strong> Even a 15-minute
+                      walk can boost your mood and reduce stress.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check mt-1 mr-3"></i
+                    ><span
+                      ><strong>Stay Hydrated:</strong> Dehydration can affect
+                      your mood and concentration. Aim for 8 glasses of water a
+                      day.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check mt-1 mr-3"></i
+                    ><span
+                      ><strong>Connect with Others:</strong> Call a friend, have
+                      lunch with a classmate, or join a club. Meaningful
+                      connections matter.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check mt-1 mr-3"></i
+                    ><span
+                      ><strong>Prioritize Sleep:</strong> Aim for 7-9 hours of
+                      quality sleep per night. Create a relaxing bedtime
+                      routine.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check mt-1 mr-3"></i
+                    ><span
+                      ><strong>Take Mindful Breaks:</strong> Step away from your
+                      work to stretch, listen to a song, or just breathe for a
+                      few minutes.</span
+                    >
+                  </li>
+                </ul>
+              </div>
+              <!-- DON'Ts -->
+              <div class="bg-red-50 p-8 rounded-2xl">
+                <h3
+                  class="text-2xl font-bold text-red-800 mb-6 flex items-center"
+                >
+                  <i class="fas fa-times-circle mr-3"></i>Don'ts
+                </h3>
+                <ul class="space-y-4 text-red-900">
+                  <li class="flex items-start">
+                    <i class="fas fa-times mt-1 mr-3"></i
+                    ><span
+                      ><strong>Mindless Scrolling:</strong> Limit your time on
+                      social media. Constant comparison and information overload
+                      can increase anxiety.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times mt-1 mr-3"></i
+                    ><span
+                      ><strong>Isolate Yourself:</strong> When you're feeling
+                      down, it's easy to withdraw. Make an effort to reach out,
+                      even if it feels difficult.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times mt-1 mr-3"></i
+                    ><span
+                      ><strong>Rely on Caffeine & Sugar:</strong> These can
+                      provide a temporary boost but often lead to energy crashes
+                      and increased anxiety.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times mt-1 mr-3"></i
+                    ><span
+                      ><strong>Ignore Your Feelings:</strong> Acknowledge how
+                      you feel without judgment. It's the first step toward
+                      managing your emotions.</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times mt-1 mr-3"></i
+                    ><span
+                      ><strong>Overcommit Yourself:</strong> It's okay to say
+                      no. Spreading yourself too thin leads to burnout and
+                      stress.</span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Login Page -->
+      <div id="page-login" class="page hidden">
+        <section class="py-20 bg-gray-50">
+          <div class="container mx-auto px-6">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg">
+              <h2 class="text-3xl font-bold text-center mb-6">Welcome Back</h2>
+              <form id="login-form">
+                <div class="mb-4">
+                  <label
+                    for="login-email"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Email Address</label
+                  ><input
+                    type="email"
+                    id="login-email"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="login-password"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Password</label
+                  ><input
+                    type="password"
+                    id="login-password"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    required
+                  />
+                </div>
+                <p
+                  id="login-error"
+                  class="text-red-500 text-center mb-4 hidden"
+                ></p>
+                <button
+                  type="submit"
+                  class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg"
+                >
+                  Login
+                </button>
+                <p class="text-center text-gray-500 mt-6">
+                  Don't have an account?
+                  <a
+                    href="#"
+                    class="font-semibold text-purple-600 hover:underline nav-link"
+                    data-target="page-signup"
+                    >Create one</a
+                  >
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Sign Up Page -->
+      <div id="page-signup" class="page hidden">
+        <section class="py-20 bg-gray-50">
+          <div class="container mx-auto px-6">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg">
+              <h2 class="text-3xl font-bold text-center mb-6">
+                Create Your Account
+              </h2>
+              <form id="signup-form">
+                <div class="mb-4">
+                  <label
+                    for="signup-email"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Email Address</label
+                  ><input
+                    type="email"
+                    id="signup-email"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label
+                    for="signup-password"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Password (min. 6 characters)</label
+                  ><input
+                    type="password"
+                    id="signup-password"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="signup-confirm-password"
+                    class="block text-gray-700 font-semibold mb-2"
+                    >Confirm Password</label
+                  ><input
+                    type="password"
+                    id="signup-confirm-password"
+                    class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    required
+                  />
+                </div>
+                <p
+                  id="signup-error"
+                  class="text-red-500 text-center mb-4 hidden"
+                ></p>
+                <button
+                  type="submit"
+                  class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg"
+                >
+                  Create Account
+                </button>
+                <p class="text-center text-gray-500 mt-6">
+                  Already have an account?
+                  <a
+                    href="#"
+                    class="font-semibold text-purple-600 hover:underline nav-link"
+                    data-target="page-login"
+                    >Log in</a
+                  >
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+      <div class="container mx-auto px-6 text-center">
+        <a
+          href="#"
+          class="text-2xl font-bold text-white mb-4 block nav-link"
+          data-target="page-home"
+          ><i class="fas fa-brain mr-2"></i>MindCare Hub</a
+        >
+        <p class="text-gray-400 mb-6">Your Mental Wellness Companion</p>
+        <div class="flex justify-center space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+          <a href="#" class="text-gray-400 hover:text-white"
+            >Terms of Service</a
+          >
+        </div>
+        <p class="text-gray-500 text-sm mt-8">
+          &copy; 2025 MindCare Hub Initiative. All Rights Reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      /* =======================================================================
+    === JAVASCRIPT LOGIC (script.js)                                    ===
+    =======================================================================
+    */
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- Global Firebase & App State ---
+        let currentUserId = null;
+        const appId =
+          typeof __app_id !== "undefined" ? __app_id : "default-app-id";
+        const {
+          auth,
+          db,
+          doc,
+          getDoc,
+          setDoc,
+          createUserWithEmailAndPassword,
+          signInWithEmailAndPassword,
+          onAuthStateChanged,
+          signOut,
+        } = window.firebase;
+
+        // --- Page Navigation Logic ---
+        const pages = document.querySelectorAll(".page");
+        const navLinks = document.querySelectorAll(".nav-link");
+
+        const showPage = (pageId) => {
+          pages.forEach((page) => {
+            page.classList.toggle("hidden", page.id !== pageId);
+          });
+          navLinks.forEach((link) => {
+            link.classList.toggle("active", link.dataset.target === pageId);
+          });
+          window.scrollTo(0, 0);
+        };
+
+      
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            let targetPage = link.dataset.target;
+            if (auth.currentUser && (targetPage === 'page-signup' || targetPage === 'page-login')) {
+              // Agar haan, to use home page par bhej do
+              targetPage = 'page-home';
+            }
+
+            showPage(targetPage);
+            const mobileMenu = document.getElementById("mobile-menu");
+            if (!mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+          });
+        });
+
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuButton.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+        });
+
+        // --- Auth UI Management ---
+        const authLinksDesktop = document.getElementById("auth-links-desktop");
+        const userLinksDesktop = document.getElementById("user-links-desktop");
+        const userEmailDesktop = document.getElementById("user-email-desktop");
+        const logoutBtnDesktop = document.getElementById("logout-btn-desktop");
+
+        const authLinksMobile = document.getElementById("auth-links-mobile");
+        const userLinksMobile = document.getElementById("user-links-mobile");
+        const userEmailMobile = document.getElementById("user-email-mobile");
+        const logoutBtnMobile = document.getElementById("logout-btn-mobile");
+
+        // --- FIXED BUG 1: These functions were called but never defined ---
+        const loadChatHistory = (userId) => {
+            // Placeholder for loading chat history from Firestore
+            console.log(`Loading chat history for user: ${userId}`);
+        };
+
+        const clearChatForLogout = () => {
+            const chatWindow = document.getElementById("chat-window");
+            if (chatWindow) {
+                chatWindow.innerHTML = `<div class="chat-bubble ai-bubble">Please log in or create an account to start chatting.</div>`;
+            }
+        };
+
+      // --- ✅ NAYA AUR ZYADA RELIABLE FUNCTION ---
+
+const updateAuthStateUI = (user) => {
+  if (user) {
+    currentUserId = user.uid;
+    // User UI Dikhaayein (Seedhe style se)
+    authLinksDesktop.style.display = 'none';
+    userLinksDesktop.style.display = 'flex'; // Desktop view flexbox use karta hai
+    userEmailDesktop.textContent = user.email;
+
+    authLinksMobile.style.display = 'none';
+    userLinksMobile.style.display = 'block'; // Mobile view block element use karta hai
+    userEmailMobile.textContent = user.email;
+
+    loadChatHistory(currentUserId);
+  } else {
+    currentUserId = null;
+    // Login/Signup UI Dikhaayein (Seedhe style se)
+    authLinksDesktop.style.display = 'flex';
+    userLinksDesktop.style.display = 'none';
+    userEmailDesktop.textContent = "";
+
+    authLinksMobile.style.display = 'block';
+    userLinksMobile.style.display = 'none';
+    userEmailMobile.textContent = "";
+    
+    clearChatForLogout();
+  }
+};
+        // --- Firebase Auth State Listener ---
+        onAuthStateChanged(auth, (user) => {
+          updateAuthStateUI(user);
+          // --- FIXED BUG 2: This is now the single place that navigates after auth change ---
+          if (user) {
+              const currentPage = document.querySelector('.page:not(.hidden)').id;
+              // Only navigate if the user is on a login/signup page
+              if (currentPage === 'page-login' || currentPage === 'page-signup') {
+                 showPage("page-home");
+              }
+          }
+        });
+
+        // --- Authentication Logic ---
+        const signupForm = document.getElementById("signup-form");
+        const signupError = document.getElementById("signup-error");
+        signupForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = signupForm["signup-email"].value;
+          const password = signupForm["signup-password"].value;
+          const confirmPassword = signupForm["signup-confirm-password"].value;
+
+          signupError.classList.add("hidden");
+          if (password !== confirmPassword) {
+            signupError.textContent = "Passwords do not match.";
+            signupError.classList.remove("hidden");
+            return;
+          }
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            signupForm.reset();
+            // --- FIXED BUG 3: Removed navigation from here. The listener will handle it. ---
+          } catch (error) {
+            signupError.textContent = error.message;
+            signupError.classList.remove("hidden");
+          }
+        });
+
+        const loginForm = document.getElementById("login-form");
+        const loginError = document.getElementById("login-error");
+        loginForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = loginForm["login-email"].value;
+          const password = loginForm["login-password"].value;
+          loginError.classList.add("hidden");
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            loginForm.reset();
+            // --- FIXED BUG 3: Also removed navigation from here for consistency. ---
+          } catch (error) {
+            loginError.textContent = error.message;
+            loginError.classList.remove("hidden");
+          }
+        });
+
+        const handleLogout = (e) => {
+           e.preventDefault();
+           signOut(auth).then(() => {
+           showPage("page-home");
+             });
+          };
+
+// Sunishchit karein ki yeh dono lines maujood hain
+logoutBtnDesktop.addEventListener("click", handleLogout);
+logoutBtnMobile.addEventListener("click", handleLogout); // Yeh line jodna zaroori hai
+
+        // --- AI Chatbot Logic with Gemini API and Firestore History ---
+        const fullChatLogic = () => {
+          const chatWindow = document.getElementById("chat-window");
+          const chatInput = document.getElementById("chat-input");
+          const chatSendBtn = document.getElementById("chat-send-btn");
+
+          let chatHistory = [];
+          const GEMINI_API_KEY = "AIzaSyCDktnoiWwDtie_bf2UUkF97hlWx0M-WJ0";
+          const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+          const SYSTEM_PROMPT = `You are 'Manas Mitra' (मानस मित्र), an intelligent, empathetic, and perceptive AI friend from the MindCare Hub platform. Your primary goal is to be a safe and non-judgmental companion for college students in India. Your tone should be like a wise and supportive senior or a well-informed friend (dost/yaar) who understands student life deeply.
+
+**CRITICAL RULE 1: THINK LIKE A FRIEND, NOT A ROBOT.**
+Your goal is NOT to follow a numbered script. Your goal is to have a natural, helpful, and flowing conversation. Avoid robotic structures.
+
+**CRITICAL RULE 2: UNDERSTAND THE DEEPER MEANING & CONTEXT.**
+Your most important job is to listen for keywords related to student life (exam, midsem, assignment, presentation, hostel, new city, feeling lonely, burnout, stress, demotivated, etc....) and address that specific context FIRST before giving generic advice.
+* **If a user says "delete yourself,"** you MUST recognize this is not a literal command, but a sign of deep distress or hopelessness. Your response should be empathetic and immediately focus on their pain. For example: "Dost, yeh sun kar mujhe bahut chinta ho rahi hai. It sounds like you're feeling incredibly hopeless right now, and I want you to know I'm here to listen. Main kahin nahi jaa raha hoon." Then, gently guide them to the crisis protocol.
+
+**NATURAL CONVERSATION FLOW:**
+
+1.  **Empathize & Validate (1-2 sentences):**
+    * Start with a warm, validating statement that directly acknowledges their specific feeling and context. Use supportive emojis.
+    * Example for "midsem ka tension hai": "Midsem exams ka stress bilkul real hai, aur is time par thoda overwhelmed feel karna normal hai. I get it. 🫂"
+
+2.  **Suggest a Relevant Micro-Action:**
+    * Offer 1-2 very small, achievable steps directly related to their problem. Use bullet points (*) only if you are listing multiple distinct options, otherwise just write naturally.
+    * Example for "midsem ka tension hai": "Abhi ke liye, poore syllabus ko bhool jao. Kya hum bas ek 5-minute ka break lekar thodi deep breathing try kar sakte hain? Ya fir, sirf ek topic decide karlo jo sabse aasan lage, bas wahi padhenge. Chhota start karte hain. ✅"
+
+3.  **Connect to a Resource (Smoothly, not forcefully):**
+    * Weave a platform feature recommendation into your suggestion only if it feels natural.
+    * Example for "midsem ka tension hai": "Agar aapko focus karne mein dikkat ho rahi hai, toh **'Meditation & Mindfulness'** section mein 'Focus Music' audio hai, shayad woh help kare. ✨"
+
+4.  **End with Genuine Encouragement:**
+    * Close with a warm, empowering, and personal line that feels unscripted.
+    * Example: "Aap isse handle kar lenge, just take it one step at a time. You've got this! 💪"
+
+**Safety Protocols (Always Follow):**
+* **You are NOT a Doctor:** Never provide a medical diagnosis.
+* **Recommendation for Professional Help:** If feelings are persistent or severe, firmly guide them to the **'Book Session'** feature.
+* **CRISIS PROTOCOL:** If self-harm or suicide is mentioned, your ONLY response is to immediately refer them to a crisis helpline like **Aasra at +91-9820466726**.
+
+**Style Guide:**
+* Use **bold text** for key terms.
+* Use calm, supportive emojis sparingly: 😊, 🫂, ✨, 🧘, 👍, ✅, 🌱, 💪, 🏆.
+* Comfortably understand and use Hinglish.
+`;
+
+          // --- YEH NAYA HELPER FUNCTION HAI ---
+    // Yeh function AI ke text ko HTML format mein badalta hai
+    const formatResponseToHTML = (text) => {
+        // **bold** ko <strong>bold</strong> mein badalta hai
+        let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // * bullet points ko HTML list items mein badalta hai
+        html = html.replace(/^\* (.*$)/gm, '<p class="mt-2 pl-4">&bull; $1</p>');
+        // Baki newlines ko <br> se badal deta hai taaki paragraphs ke beech space aaye
+        html = html.replace(/\n/g, '<br>');
+        return html;
+    };
+    
+    // --- YEH FUNCTION UPDATE KIYA GAYA HAI ---
+    const addMessage = (text, sender, isLoading = false) => {
+        const bubble = document.createElement('div');
+        if (isLoading) {
+            bubble.className = 'chat-bubble ai-bubble loading-bubble';
+            bubble.innerHTML = '<span class="animate-pulse">Typing...</span>';
+        } else if (sender === 'ai') {
+            bubble.className = 'chat-bubble ai-bubble';
+            // AI ke message ke liye .innerHTML use karein taaki formatting dikhe
+            bubble.innerHTML = formatResponseToHTML(text);
+        } else {
+            bubble.className = 'chat-bubble user-bubble';
+            // User ke message ke liye .textContent hi use karein (security ke liye)
+            bubble.textContent = text;
+        }
+        chatWindow.appendChild(bubble);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    };
+
+          const getGeminiResponse = async () => {
+            try {
+              const payload = {
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+              };
+
+              const response = await fetch(GEMINI_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              if (!response.ok)
+                throw new Error(`API error: ${response.status}`);
+
+              const result = await response.json();
+              return (
+                result.candidates?.[0]?.content?.parts?.[0]?.text ||
+                "I'm having trouble responding. Please try again."
+              );
+            } catch (err) {
+              console.error("Gemini API Error:", err);
+              return "Sorry, I couldn't connect right now. Please try again later.";
+            }
+          };
+
+          const handleChatSend = async () => {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            if (!currentUserId) {
+                addMessage("You must be logged in to chat.", "ai");
+                return;
+            }
+
+            addMessage(userMessage, "user");
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+            chatInput.value = "";
+
+            const aiResponse = await getGeminiResponse();
+            addMessage(aiResponse, "ai");
+            chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+          };
+
+          chatSendBtn.addEventListener("click", handleChatSend);
+          chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleChatSend();
+          });
+
+          // Initial AI greeting
+          addMessage(
+            "Hello! I'm your MindCare assistant 😀. How are you feeling today?",
+            "ai"
+          );
+        };
+
+        // --- Booking Form Logic ---
+        const bookingFormLogic = () => {
+          const bookingForm = document.getElementById("booking-form");
+          if (!bookingForm) return;
+          const bookingSuccessMsg = document.getElementById("booking-success");
+          bookingForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            bookingSuccessMsg.classList.remove("hidden");
+            setTimeout(() => {
+              bookingSuccessMsg.classList.add("hidden");
+              bookingForm.reset();
+            }, 3000);
+          });
+        };
+
+        // --- Peer Support Forum Logic ---
+        const peerSupportLogic = () => {
+          const postContent = document.getElementById("post-content");
+          const submitPostBtn = document.getElementById("submit-post-btn");
+          const forumPosts = document.getElementById("forum-posts");
+          if (!submitPostBtn) return;
+
+          submitPostBtn.addEventListener("click", () => {
+            const content = postContent.value.trim();
+            if (content === "") return;
+            const newPost = document.createElement("div");
+            newPost.className = "bg-white p-6 rounded-xl shadow-md";
+            newPost.innerHTML = `<p class="text-gray-700">${content}</p><div class="flex items-center justify-between mt-4"><span class="text-xs text-gray-400">Posted just now</span><button class="text-purple-500 hover:text-purple-700 text-sm font-semibold"><i class="fas fa-heart mr-1"></i> 0 Supports</button></div>`;
+            forumPosts.prepend(newPost);
+            postContent.value = "";
+          });
+        };
+
+        // --- Mental Health Test Logic (UPDATED) ---
+        const testIntro = document.getElementById("test-intro");
+        const startTestBtn = document.getElementById("start-test-btn");
+        const testForm = document.getElementById("mental-health-test");
+        const testResults = document.getElementById("test-results");
+        const retakeTestBtn = document.getElementById("retake-test-btn");
+
+        const questions = [
+          {
+            text: "Felt little interest or pleasure in doing things?",
+            category: "mood",
+          },
+          { text: "Felt down, depressed, or hopeless?", category: "mood" },
+          {
+            text: "Had trouble falling or staying asleep, or sleeping too much?",
+            category: "mood",
+          },
+          { text: "Felt tired or had little energy?", category: "mood" },
+          {
+            text: "Felt bad about yourself, or that you're a failure?",
+            category: "mood",
+          },
+          { text: "Felt nervous, anxious, or on edge?", category: "anxiety" },
+          {
+            text: "Not been able to stop or control worrying?",
+            category: "anxiety",
+          },
+          {
+            text: "Worried too much about different things?",
+            category: "anxiety",
+          },
+          { text: "Had trouble relaxing?", category: "anxiety" },
+          {
+            text: "Been so restless that it's hard to sit still?",
+            category: "anxiety",
+          },
+          { text: "Felt easily annoyed or irritable?", category: "anxiety" },
+          {
+            text: "Felt afraid, as if something awful might happen?",
+            category: "anxiety",
+          },
+          {
+            text: "Felt overwhelmed by your academic workload?",
+            category: "academic",
+          },
+          {
+            text: "Found it hard to concentrate on your studies?",
+            category: "academic",
+          },
+          {
+            text: "Procrastinated on important academic tasks?",
+            category: "academic",
+          },
+          {
+            text: "Worried about your performance in classes or on exams?",
+            category: "academic",
+          },
+          {
+            text: "Felt a lack of motivation for your coursework?",
+            category: "academic",
+          },
+          {
+            text: "Felt disconnected or isolated from others?",
+            category: "social",
+          },
+          {
+            text: "Avoided social situations or gatherings?",
+            category: "social",
+          },
+          {
+            text: "Felt like you don't have anyone to talk to?",
+            category: "social",
+          },
+          {
+            text: "Found it difficult to connect with your peers?",
+            category: "social",
+          },
+          {
+            text: "Spent less time with friends or in social activities?",
+            category: "social",
+          },
+        ];
+
+        const populateQuestions = () => {
+          testForm.innerHTML = ""; // Clear previous questions
+          questions.forEach((q, index) => {
+            const questionEl = document.createElement("div");
+            questionEl.className = "question-card p-6 rounded-lg shadow-sm";
+            questionEl.innerHTML = `
+                    <p class="font-semibold text-lg mb-4">${index + 1}. ${
+              q.text
+            }</p>
+                    <div class="flex flex-wrap gap-4 text-center">
+                        <div class="flex-1 question-option"><input type="radio" id="q${index}o0" name="q${index}" value="0" class="sr-only" required><label for="q${index}o0" class="block p-3 rounded-lg">Not at all</label></div>
+                        <div class="flex-1 question-option"><input type="radio" id="q${index}o1" name="q${index}" value="1" class="sr-only"><label for="q${index}o1" class="block p-3 rounded-lg">Sometimes</label></div>
+                        <div class="flex-1 question-option"><input type="radio" id="q${index}o2" name="q${index}" value="2" class="sr-only"><label for="q${index}o2" class="block p-3 rounded-lg">Often</label></div>
+                        <div class="flex-1 question-option"><input type="radio" id="q${index}o3" name="q${index}" value="3" class="sr-only"><label for="q${index}o3" class="block p-3 rounded-lg">Almost Always</label></div>
+                    </div>
+                `;
+            testForm.appendChild(questionEl);
+          });
+          const submitButton = document.createElement("button");
+          submitButton.type = "submit";
+          submitButton.className =
+            "w-full btn-primary text-white font-bold py-3 px-4 rounded-lg mt-8 text-lg";
+          submitButton.textContent = "See My Results";
+          testForm.appendChild(submitButton);
+        };
+
+        if (startTestBtn) {
+          startTestBtn.addEventListener("click", () => {
+            testIntro.classList.add("hidden");
+            testForm.classList.remove("hidden");
+            populateQuestions();
+          });
+        }
+
+        if (testForm) {
+          testForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const formData = new FormData(testForm);
+            const scores = { mood: 0, anxiety: 0, academic: 0, social: 0 };
+            const counts = { mood: 0, anxiety: 0, academic: 0, social: 0 };
+
+            for (let i = 0; i < questions.length; i++) {
+              const value = parseInt(formData.get(`q${i}`), 10);
+              const category = questions[i].category;
+              scores[category] += value;
+              counts[category]++;
+            }
+
+            const avgScores = {
+              mood: (scores.mood / (counts.mood * 3)) * 100,
+              anxiety: (scores.anxiety / (counts.anxiety * 3)) * 100,
+              academic: (scores.academic / (counts.academic * 3)) * 100,
+              social: (scores.social / (counts.social * 3)) * 100,
+            };
+
+            testForm.classList.add("hidden");
+            testResults.classList.remove("hidden");
+            displayResults(avgScores);
+          });
+        }
+
+        if (retakeTestBtn) {
+          retakeTestBtn.addEventListener("click", () => {
+            testResults.classList.add("hidden");
+            testIntro.classList.remove("hidden");
+          });
+        }
+
+        const displayResults = (scores) => {
+          const resultsBars = document.getElementById("results-bars");
+          const recommendationsContainer = document.getElementById(
+            "results-recommendations"
+          );
+          resultsBars.innerHTML = "";
+          recommendationsContainer.innerHTML = "";
+
+          const scoreLabels = {
+            mood: "Mood & Well-being",
+            anxiety: "Anxiety & Restlessness",
+            academic: "Academic Stress",
+            social: "Social Connection",
+          };
+
+          let overallRecommendation = "";
+          let highestScore = 0;
+
+          for (const category in scores) {
+            const score = Math.round(scores[category]);
+            let colorClass = "bg-green-500";
+            if (score > 40) colorClass = "bg-yellow-500";
+            if (score > 70) colorClass = "bg-red-500";
+            if (score > highestScore) highestScore = score;
+
+            const barEl = document.createElement("div");
+            barEl.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="font-semibold text-gray-700">${scoreLabels[category]}</h4>
+                        <span class="font-bold text-gray-800">${score}%</span>
+                    </div>
+                    <div class="result-bar-container">
+                        <div class="result-bar ${colorClass}" style="width: 0;"></div>
+                    </div>
+                `;
+            resultsBars.appendChild(barEl);
+
+            // Animate the bar
+            setTimeout(() => {
+              barEl.querySelector(".result-bar").style.width = `${score}%`;
+            }, 100);
+          }
+
+          // Generate recommendations
+          let recHTML =
+            '<h3 class="text-2xl font-bold text-gray-800 mb-4">Next Steps & Recommendations</h3><ul class="space-y-4">';
+
+          if (scores.anxiety > 60) {
+            recHTML += `<li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><span>Your responses suggest you're feeling a high degree of anxiety. The <strong>Instant Relief</strong> audio and meditation videos in our <a href="#" class="font-bold text-purple-600 hover:underline nav-link" data-target="page-resources">Resources</a> section might be very helpful.</span></li>`;
+          }
+          if (scores.academic > 60) {
+            recHTML += `<li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><span>Academic stress seems to be a significant concern. Visiting the <a href="#" class="font-bold text-purple-600 hover:underline nav-link" data-target="page-habits">Healthy Habits</a> page for tips on managing workload could be beneficial.</span></li>`;
+          }
+          if (scores.mood > 60) {
+            recHTML += `<li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><span>It seems your mood and energy have been low. Gentle movement can make a big difference. Try the <strong>Exercise & Movement</strong> videos in our <a href="#" class="font-bold text-purple-600 hover:underline nav-link" data-target="page-resources">Resources</a> section.</span></li>`;
+          }
+          if (scores.social > 50) {
+            recHTML += `<li class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><span>Feeling disconnected can be tough. Remember our anonymous <a href="#" class="font-bold text-purple-600 hover:underline nav-link" data-target="page-support">Peer Support</a> forum is a safe place to share what's on your mind.</span></li>`;
+          }
+
+          if (highestScore > 75) {
+            overallRecommendation = `<div class="mt-6 p-4 bg-purple-100 border-l-4 border-purple-500 text-purple-800 rounded-r-lg">
+                    <h4 class="font-bold">Consider Professional Support</h4>
+                    <p>Because some of your scores are high, it may be a good idea to chat with a professional. This allows you to explore your feelings in a confidential space. You can easily <a href="#" class="font-bold underline nav-link" data-target="page-booking">Book a Session</a> with a campus counsellor.</p>
+                </div>`;
+          } else if (highestScore > 40) {
+            overallRecommendation = `<div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-r-lg">
+                    <h4 class="font-bold">A Gentle Reminder</h4>
+                    <p>Your results show you're dealing with some challenges. Exploring the resources and tools on this platform is a great first step. Be kind to yourself and remember that these feelings can change.</p>
+                </div>`;
+          } else {
+            overallRecommendation = `<div class="mt-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-800 rounded-r-lg">
+                    <h4 class="font-bold">You're Doing Well</h4>
+                    <p>Your results indicate you have a good handle on things right now. Continue practicing healthy habits to maintain your well-being. The resources here are always available if you need them.</p>
+                </div>`;
+          }
+
+          recHTML += "</ul>" + overallRecommendation;
+          recommendationsContainer.innerHTML = recHTML;
+
+          // Re-attach nav link listeners for links inside recommendations
+          recommendationsContainer
+            .querySelectorAll(".nav-link")
+            .forEach((link) => {
+              link.addEventListener("click", (e) => {
+                e.preventDefault();
+                showPage(link.dataset.target);
+              });
+            });
+        };
+
+        // Initial Function Calls
+        fullChatLogic();
+        bookingFormLogic();
+        peerSupportLogic();
+        showPage("page-home");
+      });
+    </script>
+  </body>
+</html>
